@@ -7,13 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
-public class DemoApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-    }
-
+public class HelloController {
     @GetMapping("/")
-    public String home() {
-        return "Serwer Ubuntu + GitHub Actions działają!";
+    public String hello() {
+        return "System DevOps Działa! V1.0";
     }
 }
