@@ -20,7 +20,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./app  # Ścieżka do folderu z pom.xml i kodem
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
 
