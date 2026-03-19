@@ -5,6 +5,7 @@ on:
     branches: [ "main", "develop" ]
 
 jobs:
+  # ETAP 1: Budowanie i wysyłka obrazu (robi to GitHub w chmurze)
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -20,45 +21,39 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./app  # Ścieżka do folderu z pom.xml i kodem
+          context: ./app
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
 
+  # ETAP 2: Wdrożenie (wykonuje Twój serwer Ubuntu przez Runnera)
   deploy:
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, ubuntu] # GitHub wyśle to zadanie do Twojego Ubuntu!
+    runs-on: [self-hosted, ubuntu]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Deploy with Docker Compose
         run: |
-          # Tworzymy folder na aplikację, jeśli nie istnieje
+          # 1. Przygotowanie katalogu roboczego
           mkdir -p ~/app
-          # Kopiujemy pliki konfiguracyjne do folderu app
-          cp docker-compose.yml ~/app/
-          cp -r monitoring/ ~/app/ 2>/dev/null || true
           
+          # 2. Skopiowanie plików (z repozytorium do folderu aplikacji)
+          cp docker-compose.yml ~/app/
+          # Kopiujemy monitoring tylko jeśli folder istnieje
+          [ -d "monitoring" ] && cp -r monitoring/ ~/app/ || echo "No monitoring folder found"
+          
+          # 3. Uruchomienie aplikacji
           cd ~/app
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           
-          # Pobieramy najnowszy obraz i restartujemy kontenery
           docker compose pull
           docker compose up -d
 
-      - name: Execute Remote SSH Commands
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            mkdir -p ~/app
-            cd ~/app
-            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            sudo docker-compose pull
-            sudo docker-compose up -d
-
-      
+      - name: Send Discord Notification
+        if: always()
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d "{\"content\": \"🚀 Deployment status: ${{ job.status }} na serwerze Ubuntu!\"}" \
+          "${{ secrets.DISCORD_WEBHOOK }}"
