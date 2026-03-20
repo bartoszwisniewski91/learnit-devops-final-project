@@ -1,48 +1,41 @@
-version: '3.8'
-
 services:
-  app:
-    image: ${DOCKERHUB_USERNAME}/devops-app:latest
-    ports:
-      - "8080:8080"
+  db:
+    image: postgres:15
     restart: always
-    networks:
-      - monitoring
-    depends_on:
-      - prometheus
-
-  prometheus:
-    image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.retention.time=7d"
-    restart: always
-    networks:
-      - monitoring
+    environment:
+      POSTGRES_DB: devops_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/ready"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U user -d devops_db"]
+      interval: 5s
       timeout: 5s
       retries: 5
 
+  app:
+    image: ${DOCKERHUB_USERNAME}/devops-app:latest
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/devops_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      DOCKERHUB_USERNAME: ${DOCKERHUB_USERNAME}
+    ports:
+      - "8080:8080"
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
   grafana:
     image: grafana/grafana:latest
+    restart: always
     ports:
       - "3000:3000"
-    depends_on:
-      - prometheus
-    volumes:
-      - grafana_data:/var/lib/grafana
-    restart: always
-    networks:
-      - monitoring
-
-volumes:
-  grafana_data:
-
-networks:
-  monitoring:

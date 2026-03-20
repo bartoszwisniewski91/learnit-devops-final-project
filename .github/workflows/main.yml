@@ -22,9 +22,7 @@ jobs:
         with:
           context: ./app
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
 
   deploy:
     needs: build-and-push
@@ -34,27 +32,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub (deploy)
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
       - name: Deploy with Docker Compose
         run: |
-          set -e
-          
-          # Tworzymy folder, jeśli nie istnieje
           mkdir -p ~/app
-          
-          # Kopiujemy pliki (nadpisując stare wersje)
           cp docker-compose.yml ~/app/
-          if [ -d "monitoring" ]; then
-            cp -r monitoring/ ~/app/
-          else
-            echo "No monitoring folder found"
-          fi
+          [ -d "monitoring" ] && cp -r monitoring/ ~/app/ || echo "No monitoring folder"
           
           cd ~/app
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          
-          # Używamy docker-compose (z myślnikiem), aby uniknąć błędu "unknown command"
           docker compose pull
           docker compose up -d --force-recreate
