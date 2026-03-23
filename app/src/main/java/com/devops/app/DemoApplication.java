@@ -17,7 +17,6 @@ public class DemoApplication {
 
     private final UserService userService;
 
-    // Konstruktor wstrzykujący serwis użytkowników
     public DemoApplication(UserService userService) {
         this.userService = userService;
     }
@@ -26,24 +25,22 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-    /**
-     * Endpoint rejestracji:
-     * 1. Przyjmuje dane z formularza register.html (POST).
-     * 2. Rejestruje użytkownika w bazie PostgreSQL.
-     * 3. Przekierowuje do strony logowania z polskim komunikatem o sukcesie.
-     */
     @PostMapping("/public/register")
     public void register(@RequestParam String user, 
                          @RequestParam String pass, 
                          HttpServletResponse response) throws IOException {
         try {
             userService.register(user, pass);
-            
-            // Przygotowanie polskiego komunikatu do wyświetlenia w URL (opcjonalnie)
-            String message = URLEncoder.encode("Rejestracja pomyślna! Możesz się zalogować.", StandardCharsets.UTF_8);
+            String message = URLEncoder.encode("Sukces", StandardCharsets.UTF_8);
             response.sendRedirect("/login?success=" + message);
-            
         } catch (Exception e) {
-            // W razie błędu (np. użytkownik już istnieje) wracamy do rejestracji
-            String error = URLEncoder.encode("Błąd: " + e.getMessage(), StandardCharsets.UTF_8);
-            response.sendRedirect("/register.html?
+            String error = URLEncoder.encode("Blad", StandardCharsets.UTF_8);
+            response.sendRedirect("/register.html?error=" + error);
+        }
+    }
+
+    @GetMapping("/public/status")
+    public String status() {
+        return "Serwer dziala poprawnie. Polskie znaki: aezzcclons.";
+    }
+}
