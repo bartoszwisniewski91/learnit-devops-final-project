@@ -22,14 +22,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) 
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Dodajemy /register.html oraz /public/** do wyjątków
-                .requestMatchers("/register.html", "/public/**", "/actuator/**").permitAll()
+                // Zezwalamy na stronę główną, rejestrację i assety publiczne
+                .requestMatchers("/", "/index.html", "/register.html", "/public/**", "/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(withDefaults())
-            .httpBasic(withDefaults());
+            .formLogin(form -> form
+                .defaultSuccessUrl("/dashboard.html", true) // Po logowaniu idź do dashboardu
+                .permitAll()
+            )
+            .logout(logout -> logout.logoutSuccessUrl("/index.html"));
         
         return http.build();
     }

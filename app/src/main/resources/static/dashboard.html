@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Użytkownika</title>
+    <style>
+        body { font-family: Arial; background: #f4f7f6; padding: 20px; }
+        .nav { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; }
+        .card { background: white; margin-top: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .status { color: #27ae60; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <span>Panel Monitoringu DevOps</span>
+        <a href="/logout" style="color: #ecf0f1;">Wyloguj się</a>
+    </div>
+    <div class="card">
+        <h2>Dzień dobry! 👋</h2>
+        <p>Twoje połączenie z bazą danych PostgreSQL jest <span class="status">AKTYWNE</span>.</p>
+        <p>Możesz teraz przeglądać statystyki w Grafanie na porcie 3000.</p>
+    </div>
+</body>
+</html>
