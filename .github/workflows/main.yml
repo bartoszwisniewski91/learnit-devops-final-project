@@ -33,15 +33,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy with Docker Compose
+        env:
+          # To wymusza przekazanie zmiennej do każdej komendy w tym kroku
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }} 
         run: |
-          set -e
           mkdir -p ~/app
           cp docker-compose.yml ~/app/
           [ -d "monitoring" ] && cp -r monitoring/ ~/app/ || echo "No monitoring folder"
           
           cd ~/app
-          # KLUCZOWY MOMENT: Eksportujemy zmienną do środowiska systemowego
-          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          # Tworzymy plik .env na serwerze "w locie" - to najpewniejsza metoda
+          echo "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME" > .env
           
           docker compose pull
           docker compose up -d --force-recreate
