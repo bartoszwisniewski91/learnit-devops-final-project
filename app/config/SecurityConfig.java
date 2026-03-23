@@ -14,15 +14,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableWebSecurity // DODAJ TĘ ADNOTACJĘ
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Wyłączamy CSRF na potrzeby testów
+            .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/**", "/public/**").permitAll()
+                .requestMatchers("/actuator/**", "/public/**").permitAll() // Rejestracja musi być publiczna!
                 .anyRequest().authenticated()
             )
             .formLogin(withDefaults())
@@ -30,6 +30,14 @@ public class SecurityConfig {
         
         return http.build();
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    // USUNĘLIŚMY METODĘ userDetailsService() - Spring sam znajdzie UserService
+}
 
     @Bean
     public PasswordEncoder passwordEncoder() {
