@@ -24,7 +24,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/**", "/public/**").permitAll()
+                // Dodajemy /register.html oraz /public/** do wyjątków
+                .requestMatchers("/register.html", "/public/**", "/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(withDefaults())

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rejestracja - System DevOps</title>
+    <style>
+        body { font-family: Arial; display: flex; justify-content: center; margin-top: 50px; background: #f4f4f4; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { display: block; width: 200px; margin-bottom: 10px; padding: 8px; }
+        button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Załóż konto</h2>
+        <form action="/public/register" method="post">
+            <input type="text" name="user" placeholder="Nazwa użytkownika" required>
+            <input type="password" name="pass" placeholder="Hasło" required>
+            <button type="submit">Zarejestruj się</button>
+        </form>
+        <p><a href="/login">Masz już konto? Zaloguj się</a></p>
+    </div>
+</body>
+</html>
