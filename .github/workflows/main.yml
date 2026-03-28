@@ -35,7 +35,7 @@ jobs:
           to: bartoszwisniewski91@gmail.com
           from: GitHub Actions
           body: |
-            Wdrożenie zakończone sukcesem!
+            Wdrożenie zakończone sukcesem!!!
             Commit: ${{ github.sha }}
             Autor: ${{ github.actor }}
             Link: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
