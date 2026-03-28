@@ -24,12 +24,11 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Zezwalamy na stronę główną, rejestrację i assety publiczne
                 .requestMatchers("/", "/index.html", "/register.html", "/public/**", "/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .defaultSuccessUrl("/dashboard.html", true) // Po logowaniu idź do dashboardu
+                .defaultSuccessUrl("/dashboard.html", true) 
                 .permitAll()
             )
             .logout(logout -> logout.logoutSuccessUrl("/index.html"));
