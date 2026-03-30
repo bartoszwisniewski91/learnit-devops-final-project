@@ -38,11 +38,12 @@ services:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    restart: always  
     volumes:
       - grafana-storage:/var/lib/grafana 
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
 
-# Na samym dole pliku (poza wszystkimi serwisami) dodaj:
+
 volumes:
   grafana-storage:
